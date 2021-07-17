@@ -2,24 +2,31 @@
 
 # TODO: need a script to automatically format and correct decklists (apostrophes, extra spaces, etc)
 
-#library(tidyr)
 library(dplyr)
 library(jsonlite)
 
 # Parameters
-setwd('/home/jason/Fun/Magic the Gathering/JumpStart cards')
-deck_directory="/home/jason/Fun/Magic the Gathering/JumpStart cards/Decklists"
-all_cards_file="oracle-cards-20210709210504.json"
+#setwd('/home/jason/Fun/Magic the Gathering/JumpStart cards')
+deck_directory="Decklists"
+all_cards_file="oracle-cards-20210709210504.name_only.txt"
 deck_size=20
 multiples_okay = c("Plains", "Island", "Swamp", "Mountain", "Forest",
                    "Thriving Heath", "Thriving Isle", "Thriving Moor", "Thriving Bluff", "Thriving Grove")
-cat("Checking Jumpstart decks in", deck_directory, "\n")
+cat("Checking Jumpstart decks in directory", deck_directory, "\n")
 
 # Load data
+cat("\tLoading data\n")
 decklists = list.files(path=deck_directory, pattern=".csv", full.names = TRUE)
 decks = lapply(decklists, read.csv)
 data = do.call(rbind, decks)
-all_cards = fromJSON(all_cards_file)$name # List of all cards
+all_cards = scan(all_cards_file, what=character(), sep='\n') # List of all cards
+
+###########
+# Correct common issues
+###########
+
+data$Card = gsub(data$Card, pattern="’", repl="'") # Frequent apostrophe error
+
 
 #################
 # Check deck size
